@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrame", "GameFrame\GameFrame\GameFrame.csproj", "{D4FF68C0-5742-4A6B-81A1-5053B7DFC88A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameContent", "GameFrame\GameFrameContent\GameFrameContent.contentproj", "{4ECBD6D7-AAD9-4589-BA38-C0EEC83D92E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83CED194-4BD5-46B1-A0CE-E4B247F10A06}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4FF68C0-5742-4A6B-81A1-5053B7DFC88A}.Debug|x86.ActiveCfg = Debug|x86
+		{D4FF68C0-5742-4A6B-81A1-5053B7DFC88A}.Debug|x86.Build.0 = Debug|x86
+		{D4FF68C0-5742-4A6B-81A1-5053B7DFC88A}.Release|x86.ActiveCfg = Release|x86
+		{D4FF68C0-5742-4A6B-81A1-5053B7DFC88A}.Release|x86.Build.0 = Release|x86
+		{4ECBD6D7-AAD9-4589-BA38-C0EEC83D92E2}.Debug|x86.ActiveCfg = Debug|x86
+		{4ECBD6D7-AAD9-4589-BA38-C0EEC83D92E2}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

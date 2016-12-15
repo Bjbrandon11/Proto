@@ -16,15 +16,15 @@ namespace GameFrame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        Animation animation;
         Rectangle hBox; //Player HitBox
         KeyboardState oldKb;
         MouseState oldMouse;
         Texture2D ptxt;
         Texture2D blt;
-
         List<Bullet> bList;
 
+        int oldLooking;
         int sWidth, sHeight;//screen lengths
         int mspeed;     //movement speed
         double rX,rY;   //real locations (decimals)
@@ -36,6 +36,7 @@ namespace GameFrame
             mode = pMode.Explore;
             hBox = new Rectangle();
             mspeed = 6;
+            animation = new Animation("proto_run_4", 50f, 10, true);
             oldKb = new KeyboardState();
             oldMouse = new MouseState();
             bList = new List<Bullet>();
@@ -44,6 +45,7 @@ namespace GameFrame
             hBox = new Rectangle(sWidth / 2 - 12, sHeight / 2 - 12, 24, 24);   //set the location and lengths of hitbox
             rX = hBox.X;
             rY = hBox.Y;
+            oldLooking = -1;
 
         }
         public void LoadContent()
@@ -72,6 +74,40 @@ namespace GameFrame
                 ///7=left
                 ///8=up left
                 /// </summary>
+                int look = looking(new Vector2(mouse.X, mouse.Y));
+                if(look!=oldLooking)
+                    switch (looking(new Vector2(mouse.X, mouse.Y)))
+                    {
+                        case 0:
+                            animation = new Animation("proto_run_4", 50f, 10, false, SpriteEffects.FlipHorizontally);
+                            break;
+                        case 1:
+                            animation = new Animation("proto_run_2", 50f, 10, false);
+                            break;
+                        case 2:
+                            animation = new Animation("proto_run_2", 50f, 10, false);
+                            break;
+                        case 3:
+                            animation = new Animation("proto_run_2", 50f, 10, false);
+                            break;
+                        case 4:
+                            animation = new Animation("proto_run_4", 50f, 10, false);
+                            break;
+                        case 5:
+                            animation = new Animation("proto_run_6", 50f, 10, false);
+                            break;
+                        case 6:
+                            animation = new Animation("proto_run_6", 50f, 10, false);
+                            break;
+                        case 7:
+                            animation = new Animation("proto_run_6", 50f, 10, false);
+                            break;
+                        default:
+                            animation = new Animation("proto_run_6", 50f, 10, false);
+                            break;
+
+                    }
+
                 if (kb.IsKeyDown(Keys.W) && hBox.Y > 0 && (kb.IsKeyUp(Keys.A) && kb.IsKeyUp(Keys.D)))
                     movement(1);
                 if (kb.IsKeyDown(Keys.S) && hBox.Y + hBox.Height < sHeight && (kb.IsKeyUp(Keys.A) && kb.IsKeyUp(Keys.D)))
@@ -88,6 +124,8 @@ namespace GameFrame
                     movement(2);
                 if (kb.IsKeyDown(Keys.S) && kb.IsKeyDown(Keys.D))
                     movement(4);
+                if (kb.IsKeyUp(Keys.W) && kb.IsKeyUp(Keys.A) && kb.IsKeyUp(Keys.S) && kb.IsKeyUp(Keys.D))
+                    animation.setLoop(false);
                 hBox.X = (int)rX;//sets the hitBox to the real location 
                 hBox.Y = (int)rY;
                 if (mouse.LeftButton == ButtonState.Pressed)//if left mouse is clicked , it creates a bullet aiming to your mouse
@@ -106,6 +144,10 @@ namespace GameFrame
                     if (bList[i].getX() > sWidth || bList[i].getX() + bList[i].getRec().Width < 0 || bList[i].getY() > sHeight || bList[i].getY() + bList[i].getRec().Height < 0)//deletes all bullets that go off screen
                         bList.RemoveAt(i);
                 }
+                animation.setVect(new Vector2(hBox.Center.X,hBox.Center.Y));
+                animation.PlayAnim();
+                // Console.WriteLine(looking(new Vector2(mouse.X,mouse.Y)));
+                oldLooking = look;
                 oldMouse = mouse;
                 oldKb = kb;
             }
@@ -146,12 +188,38 @@ namespace GameFrame
 
                     break;
             }
+            animation.setLoop(true);
+        }
+        public int looking(Vector2 dest)
+        {
+            int ang = ((int)((Tools.radToDeg(Tools.calcRad(new Vector2((float)rX, (float)rY), dest)))));
+
+            if (ang <= -112.5 && ang >= -157.5)
+                return 1;
+            if (ang >= -112.5 && ang <= -67.5)
+                return 2;
+            if (ang >= -67.5 && ang <= -22.5)
+                return 3;
+            if (ang >= -22.5 && ang <= 22.5)
+                return 4;
+            if (ang >= 22.5 && ang <= 67.5)
+                return 5;
+            if (ang >= 67.5 && ang <= 112.5)
+                return 6;
+            if (ang >= 112.5 && ang <= 157.5)
+                return 7;
+            if (ang >= 157.5  || ang <= -157.5)
+                return 0;
+
+
+            return -1;
         }
         public void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < bList.Count(); i++)
                 spriteBatch.Draw(ptxt, bList[i].getRec(), Color.Black);//draws bullet
-            spriteBatch.Draw(ptxt, hBox, Color.Red);//draws player
+            spriteBatch.Draw(ptxt, hBox, Color.Transparent);//draws player
+            animation.Draw();
         }
         public void setPMode(pMode m) { mode = m; }
         public List<Bullet> getList() { return bList; }

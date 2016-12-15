@@ -17,7 +17,7 @@ namespace GameFrame
         int hit;
         public Enemy()
         {
-            health = 400;
+            health = 20;
             hBox = new Rectangle(500,100,30,30);
             speed = 5;
             hit = 30;

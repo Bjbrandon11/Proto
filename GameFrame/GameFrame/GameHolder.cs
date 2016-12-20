@@ -12,5 +12,6 @@ namespace GameFrame
         public static Game Game { get; set; }
         public static GameTime gameTime { get; set; }
         public static SpriteBatch spriteBatch { get; set; }
+        public static Player Player { get; set; }
     }
 }

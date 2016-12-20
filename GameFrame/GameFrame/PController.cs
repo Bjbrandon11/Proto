@@ -1,70 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace GameFrame
 {
-    
-    public class Player
+    class PController
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Animation animation;
-        Rectangle hBox; //Player HitBox
-        KeyboardState oldKb;
-        MouseState oldMouse;
-        Texture2D ptxt;
-        Texture2D blt;
-        List<Bullet> bList;
+        static GraphicsDeviceManager graphics;
+        static SpriteBatch spriteBatch;
+        static Animation animation = new Animation("proto_run_4", 50f, 10, true);
+        static Rectangle hBox = new Rectangle(GameHolder.Game.Window.ClientBounds.Width / 2 - 12, GameHolder.Game.Window.ClientBounds.Height / 2 - 12, 24, 24); //Player HitBox
+        static KeyboardState oldKb = new KeyboardState();
+        static MouseState oldMouse = new MouseState();
+        static Texture2D ptxt = GameHolder.Game.Content.Load<Texture2D>("wsquare");
+        static Texture2D blt = GameHolder.Game.Content.Load<Texture2D>("wbullet");
+        static List<Bullet> bList = new List<Bullet>();
 
-        private int look;
-        private int oldLook;
-        private int sWidth, sHeight;//screen lengths
-        private int mspeed;     //movement speed
-        private int shRate;
-        private int tmpRa;
-        private double rX, rY;   //real locations (decimals)
-        public enum pMode {Explore,Battle};
+        static private int look = -1;
+        static private int oldLook = -1;
+        static private int sWidth, sHeight;//screen lengths
+        static private int mspeed = 6;     //movement speed
+        static private int shRate = 25;
+        static private int tmpRa = shRate;
+        static private double rX = hBox.X;
+        static private double rY = hBox.Y;   //real locations (decimals)
+        public enum pMode { Explore, Battle };
 
-        private pMode mode;
-        //public Vector2 playerDir;
-        //public Vector2 playerFric;
-        public Player()
-        {
-            mode = pMode.Explore;
-            hBox = new Rectangle();
-            mspeed = 6;//our movement speed
-            shRate = 25; //our shooting rate
-            animation = new Animation("proto_run_4", 50f, 10, true);
-            oldKb = new KeyboardState();
-            oldMouse = new MouseState();
-            bList = new List<Bullet>();
-            sWidth = GameHolder.Game.Window.ClientBounds.Width;
-            sHeight = GameHolder.Game.Window.ClientBounds.Height;
+        private pMode mode = pMode.Explore; 
+            //our movement speed
+            //our shooting rate
+            
+            
+            
+            
             //set the start coordinates and dimensions of hitbox
             //!!NOTE TO SELF: We need to make a new method that alters and returns the player coordinates!!
-            hBox = new Rectangle(sWidth / 2 - 12, sHeight / 2 - 12, 24, 24); //(Width,height,x-coord,y-coord)  
-            rX = hBox.X; //our hitbox's x-coordinate
-            rY = hBox.Y; //our hitbox's y-coordinate
-            tmpRa = shRate;//The rate we actually modify when we check for alt-fire rate.
-            look = -1;
-            oldLook = -1;
-            //playerDir = new Vector2(0,0);
-            //playerFric = playerDir;
-        }
-        public void LoadContent()
-        {
-            ptxt = GameHolder.Game.Content.Load<Texture2D>("wsquare");
-            blt = GameHolder.Game.Content.Load<Texture2D>("wbullet");
-        }
-       public void UnloadContent()
+             //(Width,height,x-coord,y-coord)  
+             //our hitbox's x-coordinate
+             //our hitbox's y-coordinate
+            //The rate we actually modify when we check for alt-fire rate.
+            
+            
+        public void UnloadContent()
         {
 
         }
@@ -75,7 +56,7 @@ namespace GameFrame
             MouseState mouse = Mouse.GetState();    // gets state of mouse , locations , if pressed ect.
             movementManager(kb);
             lookingManager(mouse);
-            if (mode==pMode.Battle)
+            if (mode == pMode.Battle)
             {
                 shootManager(mouse);
                 // Console.WriteLine(looking(new Vector2(mouse.X,mouse.Y)));
@@ -157,11 +138,11 @@ namespace GameFrame
             //Console.WriteLine(playerDir);
             hBox.X = (int)rX;
             hBox.Y = (int)rY;
-            
+
         }
         public void movement(int d)
         {
-            switch(d)
+            switch (d)
             {
                 case 1:
                     rY += -1 * mspeed;
@@ -200,7 +181,7 @@ namespace GameFrame
         //This method emulates static friction.
         public void staticFric()
         {
-            
+
         }
         //This method emulates KINETIC friction.
         public void lookingManager(MouseState mouse)
@@ -312,7 +293,7 @@ namespace GameFrame
                 return 6;
             if (ang >= 112.5 && ang <= 157.5)
                 return 7;
-            if (ang >= 157.5  || ang <= -157.5)
+            if (ang >= 157.5 || ang <= -157.5)
                 return 0;
 
 
@@ -330,6 +311,5 @@ namespace GameFrame
         }
         public void setPMode(pMode m) { mode = m; }
         public List<Bullet> bulletList() { return bList; }
-        public Rectangle getHBox() { return hBox; }
     }
 }

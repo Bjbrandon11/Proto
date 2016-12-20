@@ -34,7 +34,7 @@ namespace GameFrame
         public void Update(GameTime gameTime)
         {
             P1.Update(gameTime);
-
+            GameHolder.Player = P1;
             for (int i = 0; i < EL.Count; i++)
             {
                 EL[i].Update();

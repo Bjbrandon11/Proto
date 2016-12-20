@@ -79,6 +79,7 @@
     <Compile Include="DBox.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="GameHolder.cs" />
+    <Compile Include="PController.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

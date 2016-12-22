@@ -8,6 +8,7 @@ namespace GameFrame
 {
     class Tools
     {
+        public static Random random = new Random();
         public static double calcRad(Vector2 origin, Vector2 dest)
         {
             return (double)Math.Atan2(dest.Y - origin.Y, dest.X - origin.X);

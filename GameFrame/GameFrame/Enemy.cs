@@ -16,6 +16,8 @@ namespace GameFrame
         int speed;
         int hit;
         int wait;
+        int raomTime;
+        int raom;
         int waitTime;
         List<Bullet> bList;
         Random r;
@@ -23,31 +25,23 @@ namespace GameFrame
         AttackState attack;
         public Enemy()
         {
+            inst();
+        }
+        public Enemy(Vector2 loc)
+        {
+            inst();
+            hBox = new Rectangle((int)loc.X, (int)loc.Y, 30, 30);
+        }
+        public void inst()
+        {
             health = 400;
             hBox = new Rectangle(500, 100, 30, 30);
             speed = 5;
             hit = 30;
-            r = new Random();
-            r.Next();
             wait = 0;
-            waitTime = r.Next(120,360);
+            waitTime = Tools.random.Next(120, 360);
             c = Color.Green; //Set the normal color
             cc = c; //Change the current color to green.
-            bList = new List<Bullet>();
-            attack = AttackState.wait;
-        }
-        public Enemy(Vector2 loc)
-        {
-            health = 400;
-            hBox = new Rectangle((int)loc.X, (int)loc.Y, 30, 30);
-            speed = 5;
-            hit = 30;
-            r = new Random();
-            r.Next();
-            c = Color.Green;
-            cc = c;
-            wait = 0;
-            waitTime = r.Next(120,360);
             bList = new List<Bullet>();
             attack = AttackState.wait;
         }
@@ -79,9 +73,17 @@ namespace GameFrame
                     if(wait>waitTime)
                     {
                         wait = 0;
-                        attack = (AttackState)r.Next(7);
+                        attack = (AttackState)Tools.random.Next(7);
                     }
                     break;
+                case AttackState.threeShot:
+                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))-10));
+                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))));
+                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))+10));
+                    attack = AttackState.wait;
+                    break;
+                case AttackState.roam:
+
                 default:
                     attack = AttackState.wait;
                     break;

@@ -22,8 +22,16 @@ namespace GameFrame
     {
         public Collision(int i, Rectangle rec)
         {
-            texture = GameHolder.Game.Content.Load<Texture2D>("wsquare");
+            texture = GameHolder.Game.Content.Load<Texture2D>(idToName(i));
             this.Rectangle = rec;
+        }
+        public String idToName(int i)
+        {
+            if (i == 1)
+                return "Tile_Brick_1";
+            if (i == 2)
+                return "Tile_Brick_1_Bottom";
+            return "Null";
         }
     }
 }

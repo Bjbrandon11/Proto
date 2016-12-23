@@ -22,6 +22,9 @@ namespace GameFrame
         MouseState oldMouse;
         Texture2D ptxt;
         Texture2D blt;
+        Texture2D Head;
+        Texture2D Body;
+        Rectangle bRec,hRec;
         List<Bullet> bList;
 
         private int look;
@@ -43,6 +46,8 @@ namespace GameFrame
             mspeed = 6;//our movement speed
             shRate = 25; //our shooting rate
             animation = new Animation("proto_run_4", 50f, 10, true);
+            Head = GameHolder.Game.Content.Load<Texture2D>("Proto_Head_1_5");
+            Body = GameHolder.Game.Content.Load<Texture2D>("Proto_Body_1_5");
             oldKb = new KeyboardState();
             oldMouse = new MouseState();
             bList = new List<Bullet>();
@@ -208,6 +213,36 @@ namespace GameFrame
             look = looking(new Vector2(mouse.X, mouse.Y));
             if (look != oldLook)
             {
+                /* switch (looking(new Vector2(mouse.X, mouse.Y)))
+                 {
+                     case 0:
+                         animation = new Animation("proto_run_4", 50f, 10, false, SpriteEffects.FlipHorizontally);
+                         break;
+                     case 1:
+                         animation = new Animation("proto_run_2", 50f, 10, false);
+                         break;
+                     case 2:
+                         animation = new Animation("proto_run_2", 50f, 10, false);
+                         break;
+                     case 3:
+                         animation = new Animation("proto_run_2", 50f, 10, false);
+                         break;
+                     case 4:
+                         animation = new Animation("proto_run_4", 50f, 10, false);
+                         break;
+                     case 5:
+                         animation = new Animation("proto_run_6", 50f, 10, false);
+                         break;
+                     case 6:
+                         animation = new Animation("proto_run_6", 50f, 10, false);
+                         break;
+                     case 7:
+                         animation = new Animation("proto_run_6", 50f, 10, false);
+                         break;
+                     default:
+                         animation = new Animation("proto_run_6", 50f, 10, false);
+                         break;
+                 }*/
                 switch (looking(new Vector2(mouse.X, mouse.Y)))
                 {
                     case 0:
@@ -326,6 +361,7 @@ namespace GameFrame
                 else spriteBatch.Draw(blt, bList[i].getRec(), Color.Black);//draws bullet
             }
             spriteBatch.Draw(ptxt, hBox, Color.Transparent);//draws player
+            spriteBatch.Draw(Body, hBox, Color.White);
             animation.Draw();
         }
         public void setPMode(pMode m) { mode = m; }

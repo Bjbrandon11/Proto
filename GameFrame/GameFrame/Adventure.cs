@@ -11,12 +11,14 @@ namespace GameFrame
     {
         Player P1;
         List<Enemy> EL;
-        String map;
+        String mp;
         Random r;
+        TileMap map;
         //Randomizes enemy placement when 
-        public Adventure(String map)
+        public Adventure(String mp)
         {
-            this.map = map;
+            this.mp = mp;
+            map = new TileMap();
             r = new Random();
             r.Next();
             P1 = new Player(); //Creates the player
@@ -27,6 +29,14 @@ namespace GameFrame
         }
         public void LoadContent()
         {
+            map.Gen(new int[,]
+            {
+                {0,0,0,1},
+                { 0,0,0,1},
+                { 0,0,0,1},
+                { 0,0,0,1},
+            }
+                ,64);
             P1.LoadContent();
             for (int i = 0; i < EL.Count; i++)
                 EL[i].LoadContent();
@@ -68,6 +78,7 @@ namespace GameFrame
         }
         public void Draw(SpriteBatch spriteBatch)
         {
+            map.Draw();
             P1.Draw(spriteBatch);
             for (int i = 0; i < EL.Count; i++)
                 EL[i].Draw(spriteBatch);

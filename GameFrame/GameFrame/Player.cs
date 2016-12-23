@@ -69,7 +69,7 @@ namespace GameFrame
 
         }
 
-        public void Update(GameTime gameTime)    //will run everytime game Updates
+        public void Update(float gameTime)    //will run everytime game Updates
         {
             KeyboardState kb = Keyboard.GetState(); //gets the state of keyboard , what keys are pressed , ect.
             MouseState mouse = Mouse.GetState();    // gets state of mouse , locations , if pressed ect.

@@ -49,7 +49,7 @@ namespace GameFrame
         {
             etxt = GameHolder.Game.Content.Load<Texture2D>("wsquare"); //Loads the enemy's sprite
         }
-        public void Update()
+        public void Update(float time)
         {
             //Makes so player knows if enemy was hit, otherwise color is unseeable to player
             if (hit < 3)

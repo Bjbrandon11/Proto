@@ -14,34 +14,55 @@ namespace GameFrame
     
     public class Player
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Animation animation;
-        Rectangle hBox; //Player HitBox
-        KeyboardState oldKb;
-        MouseState oldMouse;
-        Texture2D ptxt;
-        Texture2D blt;
-        List<Bullet> bList;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        private Animation animation;
+        private Rectangle hBox; //Player HitBox
+        private KeyboardState oldKb;
+        private MouseState oldMouse;
+        private Texture2D ptxt;
+        private Texture2D blt;
+        private Texture2D hthMeterTxt;
+        private Rectangle hthMeter;
+        private Rectangle hthMeterSrc;
+        private Rectangle dispSecShot;
+        public List<Bullet> bList;
 
-        private int look;
-        private int oldLook;
+        private static int health, maxHealth;
+        private int look, oldLook;
         private int sWidth, sHeight;//screen lengths
         private int mspeed;     //movement speed
-        private int shRate;
-        private int tmpRa;
+        //Dimensions of health meter
+        private float hthMeter_SX;
+        private int hthMeter_SY;
+        private float hthMeter_FF;//FF stands for filled factor, what percentage of health is there?
+        //a set rate of shooting
+        private float shRate;
+        private float periodSecShot;
+        private float elapsedGameSec;
         private double rX, rY;   //real locations (decimals)
-        public enum pMode {Explore,Battle};
+        public enum pMode {Explore,Battle, Dead};
+        public enum fireMode {Normal,Spread,Blast,Stream, Sniper};
 
         private pMode mode;
+        private fireMode fMode;
         //public Vector2 playerDir;
         //public Vector2 playerFric;
         public Player()
         {
-            mode = pMode.Explore;
-            hBox = new Rectangle();
+            maxHealth = 100;
+            health = maxHealth;
+            hthMeter_FF = 1f;
+            hthMeter_SX = 200f;
+            hthMeter_SY = 20;
             mspeed = 6;//our movement speed
-            shRate = 25; //our shooting rate
+            shRate = .5f; //our shooting rate
+            periodSecShot = 0f;
+            elapsedGameSec = 0f;
+            mode = pMode.Explore;
+            fMode = fireMode.Normal;
+            hthMeter = new Rectangle(10,10, (int)(hthMeter_SX * hthMeter_FF), hthMeter_SY);
+            hthMeterSrc = hthMeter;
             animation = new Animation("proto_run_4", 50f, 10, true);
             oldKb = new KeyboardState();
             oldMouse = new MouseState();
@@ -53,7 +74,6 @@ namespace GameFrame
             hBox = new Rectangle(sWidth / 2 - 12, sHeight / 2 - 12, 24, 24); //(Width,height,x-coord,y-coord)  
             rX = hBox.X; //our hitbox's x-coordinate
             rY = hBox.Y; //our hitbox's y-coordinate
-            tmpRa = shRate;//The rate we actually modify when we check for alt-fire rate.
             look = -1;
             oldLook = -1;
             //playerDir = new Vector2(0,0);
@@ -63,25 +83,37 @@ namespace GameFrame
         {
             ptxt = GameHolder.Game.Content.Load<Texture2D>("wsquare");
             blt = GameHolder.Game.Content.Load<Texture2D>("wbullet");
+            hthMeterTxt = GameHolder.Game.Content.Load<Texture2D>("hthMeter");
         }
        public void UnloadContent()
         {
 
         }
 
-        public void Update(GameTime gameTime)    //will run everytime game Updates
+        public void Update(float gameTime)    //will run everytime game Updates
         {
-            KeyboardState kb = Keyboard.GetState(); //gets the state of keyboard , what keys are pressed , ect.
-            MouseState mouse = Mouse.GetState();    // gets state of mouse , locations , if pressed ect.
-            movementManager(kb);
-            lookingManager(mouse);
-            if (mode==pMode.Battle)
+            if (mode != pMode.Dead)
             {
-                shootManager(mouse);
-                // Console.WriteLine(looking(new Vector2(mouse.X,mouse.Y)));
-                oldLook = look;
-                oldMouse = mouse;
-                oldKb = kb;
+                elapsedGameSec = gameTime;
+                hthMeter_FF = (float)health / maxHealth; //sets amount of health to fill
+                KeyboardState kb = Keyboard.GetState(); //gets the state of keyboard , what keys are pressed , ect.
+                MouseState mouse = Mouse.GetState();    // gets state of mouse , locations , if pressed ect.
+                movementManager(kb);
+                lookingManager(mouse);
+                if (mode == pMode.Battle)
+                {
+                    shootManager(mouse);
+                    oldLook = look;
+                    oldMouse = mouse;
+                    oldKb = kb;
+                }
+                deathChecker();
+            }
+            else if (mode == pMode.Dead)
+            {
+                Console.WriteLine("U R DED");
+                animation.setVect(new Vector2(hBox.Center.X, hBox.Center.Y));
+                animation.PlayAnim();
             }
         }
         public void movementManager(KeyboardState kb)
@@ -151,6 +183,13 @@ namespace GameFrame
             if (kb.IsKeyUp(Keys.W) && kb.IsKeyUp(Keys.A) && kb.IsKeyUp(Keys.S) && kb.IsKeyUp(Keys.D))
                 animation.setLoop(false);
 
+            //Normal,Spread,Blast,Stream, Sniper
+            if (kb.IsKeyDown(Keys.D1)) fMode = fireMode.Normal;
+            else if (kb.IsKeyDown(Keys.D2)) fMode = fireMode.Spread;
+            else if (kb.IsKeyDown(Keys.D3)) fMode = fireMode.Blast;
+            else if (kb.IsKeyDown(Keys.D4)) fMode = fireMode.Stream;
+            else if (kb.IsKeyDown(Keys.D5)) fMode = fireMode.Sniper;
+
             //sets the hitBoxes to the real location 
             //playerDir = new Vector2((float)rX-hBox.X, (float)rY-hBox.Y); //And update the player's direction
             //playerFric = -playerDir;
@@ -197,12 +236,6 @@ namespace GameFrame
             }
             animation.setLoop(true);
         }
-        //This method emulates static friction.
-        public void staticFric()
-        {
-            
-        }
-        //This method emulates KINETIC friction.
         public void lookingManager(MouseState mouse)
         {
             look = looking(new Vector2(mouse.X, mouse.Y));
@@ -247,25 +280,53 @@ namespace GameFrame
             /*----------------*
              *----SHOOTING----*
              *----------------*/
+            //PRIMARY FIRE ONLY
+            //Normal,Spread,Blast,Stream, Sniper
             //if left mouse is held, it creates a stream of bullet aiming to your mouse
-            if (mouse.LeftButton == ButtonState.Pressed)
+
+            //Need to create vector for mouse.
+            Vector2 mouseVec = new Vector2(mouse.X, mouse.Y);
+            if (fMode == fireMode.Normal)
             {
-                bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), (int)Bullet.btype.normal));//bullet object takes in , Origin and Destination, in a vector
-                                                                                                                                          // a vector2 is just coordinates
+                if (mouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton != ButtonState.Pressed)
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), mouseVec, Bullet.btype.normal));//bullet object takes in , Origin and Destination, in a vector
+            }
+            else if (fMode == fireMode.Spread)
+            {
+                shRate = .5f;
+                if (mouse.LeftButton == ButtonState.Pressed && altShootTimer())
+                {
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), Tools.rotateVec(mouseVec,50), Bullet.btype.spread));//left
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), mouseVec, Bullet.btype.spread));//center
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), Tools.rotateVec(mouseVec, -50), Bullet.btype.spread));//right
+                }
+            }
+            else if (fMode == fireMode.Blast)
+            {
+                shRate = .4f;
+                if (mouse.LeftButton == ButtonState.Pressed && altShootTimer())
+                {
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), Bullet.btype.blast));//bullet object takes in , Origin and Destination, in a vector
+                }
+            }
+            else if (fMode == fireMode.Stream)
+            {
+                shRate = .1f;
+                if (mouse.LeftButton == ButtonState.Pressed && altShootTimer() && bList.Count < 25)
+                {
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), Bullet.btype.normal));//bullet object takes in , Origin and Destination, in a vector
+                }
+            }
+            else if (fMode == fireMode.Sniper)
+            {
+                shRate = .5f;
+                //Adds in a semi-auto function to bullets, creates A SNIPER BULLET
+                if (mouse.LeftButton == ButtonState.Pressed && altShootTimer())
+                {
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), Bullet.btype.sniper));//bullet object takes in , Origin and Destination, in a vector
+                }
             }
 
-            //if right mouse is held, it creates A STRONG BULLET
-            if (mouse.RightButton == ButtonState.Pressed && altShootTimer())
-            {
-                bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), (int)Bullet.btype.strong));//bullet object takes in , Origin and Destination, in a vector
-            }
-            /*
-            //Adds in a semi-auto function to bullets, creates A SNIPER BULLET
-            if (mouse.RightButton == ButtonState.Pressed && oldMouse.RightButton != ButtonState.Pressed)
-            {
-                bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), (int)Bullet.btype.sniper));//bullet object takes in , Origin and Destination, in a vector
-            }
-            */
             for (int i = 0; i < bList.Count; i++)//updates the bullets created
             {
                 bList[i].Update();
@@ -277,22 +338,32 @@ namespace GameFrame
         public bool altShootTimer()
         {
             MouseState mouse = Mouse.GetState();    // gets state of mouse , locations , if pressed ect.
-            if (oldMouse.RightButton == ButtonState.Pressed && tmpRa == 0)//Has right mouse been pressed, and it is time?
+            if (oldMouse.LeftButton == ButtonState.Pressed && periodSecShot >= shRate)//Has right mouse been pressed, and it is time?
             {
-                tmpRa = shRate;
+                periodSecShot = 0f;
                 return true;
             }
-            else if (mouse.RightButton == ButtonState.Released)
+            else if (mouse.LeftButton == ButtonState.Released)
             {
-                tmpRa = shRate;
+                periodSecShot = 0f;
                 return false;
             }
-            else if (oldMouse.RightButton == ButtonState.Pressed && tmpRa > 0) //Is it too soon to shoot? Then reduce time and return false
+            else if (oldMouse.LeftButton == ButtonState.Pressed && periodSecShot < shRate) //Is it too soon to shoot? Then reduce time and return false
             {
-                tmpRa--;
+                periodSecShot += elapsedGameSec;
                 return false;
             }
             else return false;
+        }
+        public bool hitManager()
+        {
+            for(int i = 0; i < bList.Count; i++)//updates the bullets created
+            {
+                bList[i].Update();
+                if (bList[i].getX() > sWidth || bList[i].getX() + bList[i].getRec().Width < 0 || bList[i].getY() > sHeight || bList[i].getY() + bList[i].getRec().Height < 0)//deletes all bullets that go off screen
+                    bList.RemoveAt(i);
+            }
+            return false;
         }
         public int looking(Vector2 dest)
         {
@@ -315,21 +386,52 @@ namespace GameFrame
             if (ang >= 157.5  || ang <= -157.5)
                 return 0;
 
-
             return -1;
         }
         public void Draw(SpriteBatch spriteBatch)
         {
+            
+            //Updates bullet
             for (int i = 0; i < bList.Count(); i++)
             {
-                if (bList[i].bt == Bullet.btype.strong) spriteBatch.Draw(blt, bList[i].getRec(), Color.Orange);
+                if (bList[i].bt == Bullet.btype.blast) spriteBatch.Draw(blt, bList[i].getRec(), Color.Orange);
                 else spriteBatch.Draw(blt, bList[i].getRec(), Color.Black);//draws bullet
             }
-            spriteBatch.Draw(ptxt, hBox, Color.Transparent);//draws player
+            //Updates player
+            if (health > 0) spriteBatch.Draw(ptxt, hBox, Color.Transparent);//draws player
+            else spriteBatch.Draw(ptxt, hBox, Color.Transparent);
             animation.Draw();
+
+            //Updates Hud Above all
+            hthMeter = new Rectangle(10, 10, (int)(hthMeter_SX * hthMeter_FF), hthMeter_SY);
+            hthMeterSrc = new Rectangle(0, 0, (int)(hthMeter_SX * hthMeter_FF), hthMeter_SY);
+            spriteBatch.Draw(hthMeterTxt, hthMeter, hthMeterSrc,Color.ForestGreen,0,new Vector2(0,0), SpriteEffects.None,1f);
+        }
+        public void hit(int point)
+        {
+            if(health-point>=0)health -= point;
+            else if (health < 0) health = 0;//sees if negative health, then corrects it.
+        }
+        public void heal(int point)
+        {
+            if (health + point < maxHealth) health += point;
+            else if (health + point >= maxHealth) health = maxHealth;
+        }
+        public static int retHealth()
+        {
+            return health;
+        }
+        public void deathChecker()
+        {
+            if (health == 0)
+            {
+                mode = pMode.Dead;
+                animation = new Animation("lnkDead", 50f, 3, true);
+            }
         }
         public void setPMode(pMode m) { mode = m; }
-        public List<Bullet> bulletList() { return bList; }
+        public pMode getPMode() { return mode; }
         public Rectangle getHBox() { return hBox; }
+        public List<Bullet> bulletList() { return bList; }
     }
 }

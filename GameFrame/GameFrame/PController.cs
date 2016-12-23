@@ -228,6 +228,7 @@ namespace GameFrame
             /*----------------*
              *----SHOOTING----*
              *----------------*/
+            Vector2 mouseVec = new Vector2(mouse.X, mouse.Y);
             //if left mouse is held, it creates a stream of bullet aiming to your mouse
             if (mouse.LeftButton == ButtonState.Pressed)
             {
@@ -238,7 +239,7 @@ namespace GameFrame
             //if right mouse is held, it creates A STRONG BULLET
             if (mouse.RightButton == ButtonState.Pressed && altShootTimer())
             {
-                bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(mouse.X, mouse.Y), (int)Bullet.btype.strong));//bullet object takes in , Origin and Destination, in a vector
+                bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y),  mouseVec, Bullet.btype.blast));//bullet object takes in , Origin and Destination, in a vector
             }
             /*
             //Adds in a semi-auto function to bullets, creates A SNIPER BULLET
@@ -303,7 +304,7 @@ namespace GameFrame
         {
             for (int i = 0; i < bList.Count(); i++)
             {
-                if (bList[i].bt == Bullet.btype.strong) spriteBatch.Draw(blt, bList[i].getRec(), Color.Orange);
+                if (bList[i].bt == Bullet.btype.blast) spriteBatch.Draw(blt, bList[i].getRec(), Color.Orange);
                 else spriteBatch.Draw(blt, bList[i].getRec(), Color.Black);//draws bullet
             }
             spriteBatch.Draw(ptxt, hBox, Color.Transparent);//draws player

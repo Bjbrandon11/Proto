@@ -13,6 +13,7 @@ namespace GameFrame
         List<Enemy> EL;
         String map;
         Random r;
+        private float elapsedGameSec;
         //Randomizes enemy placement when 
         public Adventure(String map)
         {
@@ -24,6 +25,7 @@ namespace GameFrame
             EL = new List<Enemy>();
             for (int i = 0; i < 10; i++)
                 EL.Add(new Enemy(new Vector2(r.Next(0, 500), r.Next(0, 500)))); //Random placement of enemies, may make this into method for entering rooms
+            elapsedGameSec = 0f;
         }
         public void LoadContent()
         {
@@ -31,32 +33,19 @@ namespace GameFrame
             for (int i = 0; i < EL.Count; i++)
                 EL[i].LoadContent();
         }
-        public void Update(GameTime gameTime)
+        public void Update(float gameTime)
         {
-            P1.Update(gameTime);
+            elapsedGameSec = gameTime;
+            P1.Update(elapsedGameSec);
             GameHolder.Player = P1;
             for (int i = 0; i < EL.Count; i++)
             {
-                EL[i].Update();
+                EL[i].Update(elapsedGameSec);
                 for (int x = 0; x < P1.bulletList().Count; x++)
                     //If enemy is hit with bullet
                     if (EL[i].HitBox.Intersects(P1.bulletList()[x].getRec()))
                     {
-                        //Sees if the bullet type is a STRONG ONE
-                        if (P1.bulletList()[x].bt == Bullet.btype.strong)
-                        {
-                            EL[i].Hit(200); //Take away 200 hp from enemy
-                        }
-                        //Sees if bullet is sniper
-                        if (P1.bulletList()[x].bt == Bullet.btype.sniper)
-                        {
-                            EL[i].Hit(100); //Take away 100 hp from enemy
-                        }
-                        //Sees if bullet is normal
-                        else if (P1.bulletList()[x].bt == Bullet.btype.normal)
-                        {
-                            EL[i].Hit(10);
-                        }
+                        EL[i].Hit(P1.bulletList()[x].getDam()); //Take away hp from enemy
                         //Removes bullet
                         P1.bulletList().RemoveAt(x);
                     }
@@ -64,7 +53,6 @@ namespace GameFrame
                 if (EL[i].Health < 1)
                     EL.RemoveAt(i);
             }
-
         }
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -72,5 +60,6 @@ namespace GameFrame
             for (int i = 0; i < EL.Count; i++)
                 EL[i].Draw(spriteBatch);
         }
+        public double getElapsedTime() { return elapsedGameSec; }
     }
 }

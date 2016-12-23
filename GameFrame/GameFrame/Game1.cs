@@ -76,7 +76,7 @@ namespace GameFrame
                     }
                 case gameState.test:
                     {
-                        m1.Update(gameTime);//updates the adventure object
+                        m1.Update((float)1);//updates the adventure object
                         break;
                     }
 

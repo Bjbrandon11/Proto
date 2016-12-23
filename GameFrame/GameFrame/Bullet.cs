@@ -63,5 +63,10 @@ namespace GameFrame
         public double getX() { return bullet.getReal().X; }
         public double getY() { return bullet.getReal().Y; }
         public Rectangle getRec() { return hBox; }
+
+        internal int getDam()
+        {
+            return 10;
+        }
     }
 }

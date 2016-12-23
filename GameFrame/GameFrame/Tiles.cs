@@ -22,7 +22,7 @@ namespace GameFrame
     {
         public Collision(int i, Rectangle rec)
         {
-            texture = GameHolder.Game.Content.Load<Texture2D>("Tile" + i);
+            texture = GameHolder.Game.Content.Load<Texture2D>("wsquare");
             this.Rectangle = rec;
         }
     }

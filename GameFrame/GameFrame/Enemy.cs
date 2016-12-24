@@ -9,16 +9,18 @@ namespace GameFrame
 {
     class Enemy
     {
-        int health;
-        Rectangle hBox;
-        Texture2D etxt;
-        Color c, cc;
-        int speed;
-        int hit;
-        int wait;
-        int raomTime;
-        int raom;
-        int waitTime;
+        private Rectangle hBox;
+        private Texture2D etxt;
+        private Color c, cc;
+
+        private float hit;
+        private float wait;
+        private float elapsedGameTime;
+        private int health;
+        private int speed;
+        private int roamTime;
+        private int roam;
+        private int waitTime;
         List<Bullet> bList;
         Random r;
         enum AttackState { roam,normalShoot,charge,threeShot,burstShot,circleShot,wait}
@@ -34,12 +36,13 @@ namespace GameFrame
         }
         public void inst()
         {
+            elapsedGameTime = 0;
             health = 400;
             hBox = new Rectangle(500, 100, 30, 30);
             speed = 5;
             hit = 30;
             wait = 0;
-            waitTime = Tools.random.Next(120, 360);
+            waitTime = Tools.random.Next(1, 4);//Between 1 and 4 seconds
             c = Color.Green; //Set the normal color
             cc = c; //Change the current color to green.
             bList = new List<Bullet>();
@@ -49,11 +52,12 @@ namespace GameFrame
         {
             etxt = GameHolder.Game.Content.Load<Texture2D>("wsquare"); //Loads the enemy's sprite
         }
-        public void Update(float time)
+        public void Update(float gameTime)
         {
+            elapsedGameTime = gameTime;
             //Makes so player knows if enemy was hit, otherwise color is unseeable to player
-            if (hit < 3)
-                hit++;
+            if (hit < .5)
+                hit+= elapsedGameTime;
             else
                 cc = c; //Resets current color
             foreach (Bullet b in bList) //updates bullets
@@ -69,7 +73,7 @@ namespace GameFrame
                     attack = AttackState.wait;
                     break;
                 case AttackState.wait:
-                    wait++;
+                    wait+=elapsedGameTime;
                     if(wait>waitTime)
                     {
                         wait = 0;

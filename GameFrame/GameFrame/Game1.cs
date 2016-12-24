@@ -22,6 +22,7 @@ namespace GameFrame
         enum gameState{Menu,Paused,Mode1,Mode2,test};
         gameState state;
 
+        private float elapsedGameTime;
         public int screenWidth;
         public int screenHeight;
         public Game1()
@@ -29,6 +30,7 @@ namespace GameFrame
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             GameHolder.Game = this;
+            elapsedGameTime = 0f;
         }
 
         protected override void Initialize()
@@ -64,7 +66,7 @@ namespace GameFrame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-
+            elapsedGameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
             GameHolder.gameTime =gameTime;
@@ -76,7 +78,7 @@ namespace GameFrame
                     }
                 case gameState.test:
                     {
-                        m1.Update((float)1);//updates the adventure object
+                        m1.Update(elapsedGameTime);//updates the adventure object
                         break;
                     }
 

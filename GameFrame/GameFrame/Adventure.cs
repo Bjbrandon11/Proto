@@ -13,6 +13,7 @@ namespace GameFrame
         List<Enemy> EL;
         String mp;
         Random r;
+        private float elapsedGameSec;
         TileMap map;
         private float elapsedGameSec;
         //Randomizes enemy placement when 

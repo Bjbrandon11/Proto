@@ -64,8 +64,8 @@ namespace GameFrame
             hthMeter = new Rectangle(10,10, (int)(hthMeter_SX * hthMeter_FF), hthMeter_SY);
             hthMeterSrc = hthMeter;
             animation = new Animation("proto_run_4", 50f, 10, true);
-            Head = GameHolder.Game.Content.Load<Texture2D>("Proto_Head_1_5");
-            Body = GameHolder.Game.Content.Load<Texture2D>("Proto_Body_1_5");
+            //Head = GameHolder.Game.Content.Load<Texture2D>("Proto_Head_1_5");
+            //Body = GameHolder.Game.Content.Load<Texture2D>("Proto_Body_1_5");
             oldKb = new KeyboardState();
             oldMouse = new MouseState();
             bList = new List<Bullet>();

@@ -39,6 +39,8 @@ namespace GameFrame
                 return "Tile_Dirt_1";
             if (i == 6)
                 return "Tile_Dirt_2";
+            if (i == 7)
+                return "Tile_Brick_1_Ang_1_3";
             return "Null";
         }
     }

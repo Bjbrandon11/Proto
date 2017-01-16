@@ -24,6 +24,7 @@ namespace GameFrame
         {
             bt = btype.normal;
             hBox = new Rectangle(x, y, 20, 20);
+            initializeVal();
             speed = 10;
             bullet = new Projectile(new Vector2(x, y), ang, speed);
             damage = 1;

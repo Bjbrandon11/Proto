@@ -11,6 +11,7 @@ namespace GameFrame
     {
         Player P1;
         List<Enemy> EL;
+        List<Bullet> enemyBullet;
         String mp;
         Random r;
         private float elapsedGameSec;
@@ -24,6 +25,7 @@ namespace GameFrame
             r.Next();
             P1 = new Player(); //Creates the player
             P1.setPMode(Player.pMode.Battle); //Sets the starting mode.
+            enemyBullet = new List<Bullet>();
             EL = new List<Enemy>();
             for (int i = 0; i < 10; i++)
                 EL.Add(new Enemy(new Vector2(r.Next(0, 500), r.Next(0, 500)))); //Random placement of enemies, may make this into method for entering rooms

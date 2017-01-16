@@ -23,7 +23,7 @@ namespace GameFrame
         private int waitTime;
         List<Bullet> bList;
         Random r;
-        enum AttackState { roam,normalShoot,charge,threeShot,burstShot,circleShot,wait}
+        enum AttackState { roam,normalShoot,charge,threeShot,burstShot,circleShot,plus,diag,wait}
         AttackState attack;
         public Enemy()
         {
@@ -77,17 +77,32 @@ namespace GameFrame
                     if(wait>waitTime)
                     {
                         wait = 0;
-                        attack = (AttackState)Tools.random.Next(7);
+                        attack = (AttackState)Tools.random.Next(8);
                     }
                     break;
                 case AttackState.threeShot:
-                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))-10));
+                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X-5, GameHolder.Player.getHBox().Center.Y-5))));
                     bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))));
-                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X, GameHolder.Player.getHBox().Center.Y))+10));
+                    bList.Add(new Bullet(hBox.Center.X, hBox.Center.Y, Tools.calcRad(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(GameHolder.Player.getHBox().Center.X+5, GameHolder.Player.getHBox().Center.Y+5))));
                     attack = AttackState.wait;
                     break;
                 case AttackState.roam:
-
+                    attack = AttackState.wait;
+                    break;
+                case AttackState.plus:
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X,hBox.Center.Y), new Vector2(hBox.Center.X, hBox.Center.Y+1),Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X, hBox.Center.Y - 1), Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X+1, hBox.Center.Y), Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X-1, hBox.Center.Y), Bullet.btype.normal));
+                    attack = AttackState.wait;
+                    break;
+                case AttackState.diag:
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X+1, hBox.Center.Y + 1), Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X-1, hBox.Center.Y + 1), Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X + 1, hBox.Center.Y-1), Bullet.btype.normal));
+                    bList.Add(new Bullet(new Vector2(hBox.Center.X, hBox.Center.Y), new Vector2(hBox.Center.X - 1, hBox.Center.Y-1), Bullet.btype.normal));
+                    attack = AttackState.wait;
+                    break;
                 default:
                     attack = AttackState.wait;
                     break;
